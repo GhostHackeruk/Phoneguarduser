@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Social Services • Phone Guard</title>
+  <style>
+    :root{
+      --bg:#050b0a; --line:rgba(0,255,160,.14);
+      --neon:#00ffa0; --neon2:#00d4ff; --text:#dffdf3; --muted:#86c9b5;
+      --shadow:0 0 40px rgba(0,255,160,.10), inset 0 0 60px rgba(0,40,20,.35);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh; color:var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,"Liberation Mono","Courier New", monospace;
+      background:
+        radial-gradient(900px 600px at 20% -10%, rgba(0,255,160,.18), transparent 55%),
+        radial-gradient(700px 500px at 120% 20%, rgba(0,212,255,.16), transparent 55%),
+        radial-gradient(700px 500px at 50% 120%, rgba(0,255,160,.10), transparent 55%),
+        var(--bg);
+      padding:18px 14px 40px;
+    }
+    .wrap{max-width:560px;margin:0 auto}
+    .card{
+      border:1px solid var(--line); border-radius:22px;
+      background:rgba(0,0,0,.22); box-shadow:var(--shadow);
+      padding:16px;
+    }
+    .brand{letter-spacing:.22em; font-weight:900; text-align:center; color:var(--neon); font-size:22px}
+    .sub{margin-top:6px; text-align:center; color:var(--neon2); font-size:12px; opacity:.9}
+    .grid{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+    }
+    .item{
+      border:1px solid rgba(0,255,160,.16);
+      border-radius:18px;
+      padding:14px;
+      background:rgba(0,0,0,.22);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .item b{color:var(--neon); letter-spacing:.06em}
+    .item small{display:block; color:var(--muted); margin-top:4px}
+    .go{
+      border:0; border-radius:14px;
+      padding:10px 12px;
+      background:linear-gradient(90deg, rgba(0,255,160,.95), rgba(0,212,255,.85));
+      font-weight:900; letter-spacing:.08em; cursor:pointer;
+      color:#03100d;
+      white-space:nowrap;
+    }
+    .links{display:flex; gap:10px; margin-top:12px}
+    .linkBtn{
+      flex:1; text-align:center; padding:11px 12px; border-radius:14px;
+      border:1px solid rgba(0,255,160,.25); color:var(--neon);
+      background:transparent; text-decoration:none; font-weight:800;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="brand">PHONE GUARD</div>
+      <div class="sub">Social Services • Balance-based Access</div>
+
+      <div class="grid" id="list"></div>
+
+      <div class="links">
+        <a class="linkBtn" href="home.html">← Home</a>
+        <a class="linkBtn" href="deposit.html">Deposit</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ✅ এখানে name/price change করলে সব জায়গায় change হবে
+    const SERVICES = [
+      { id:"facebook",  name:"Facebook Service",  price:2000, hint:"Account support request" },
+      { id:"whatsapp",  name:"WhatsApp Service",  price:2000, hint:"Account support request" },
+      { id:"imo",       name:"IMO Service",       price:2000, hint:"Account support request" },
+      { id:"tiktok",    name:"TikTok Service",    price:2000, hint:"Account support request" },
+      { id:"gmail",     name:"Gmail Service",     price:2000, hint:"Account support request" },
+      { id:"instagram", name:"Instagram Service", price:2000, hint:"Account support request" },
+    ];
+
+    const list = document.getElementById("list");
+    list.innerHTML = SERVICES.map(s => `
+      <div class="item">
+        <div>
+          <b>${s.name}</b>
+          <small>Price: ৳ ${s.price} • ${s.hint}</small>
+        </div>
+        <button class="go" onclick="location.href='service.html?sid=${encodeURIComponent(s.id)}'">OPEN</button>
+      </div>
+    `).join("");
+  </script>
+</body>
+</html>
