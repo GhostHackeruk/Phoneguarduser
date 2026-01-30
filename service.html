@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Service • Phone Guard</title>
+  <style>
+    :root{
+      --bg:#050b0a; --line:rgba(0,255,160,.14);
+      --neon:#00ffa0; --neon2:#00d4ff; --text:#dffdf3; --muted:#86c9b5;
+      --shadow:0 0 40px rgba(0,255,160,.10), inset 0 0 60px rgba(0,40,20,.35);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh; color:var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,"Liberation Mono","Courier New", monospace;
+      background:
+        radial-gradient(900px 600px at 20% -10%, rgba(0,255,160,.18), transparent 55%),
+        radial-gradient(700px 500px at 120% 20%, rgba(0,212,255,.16), transparent 55%),
+        radial-gradient(700px 500px at 50% 120%, rgba(0,255,160,.10), transparent 55%),
+        var(--bg);
+      padding:18px 14px 40px;
+    }
+    .wrap{max-width:560px;margin:0 auto}
+    .card{
+      border:1px solid var(--line); border-radius:22px;
+      background:rgba(0,0,0,.22); box-shadow:var(--shadow);
+      padding:16px;
+    }
+    .brand{letter-spacing:.22em; font-weight:900; text-align:center; color:var(--neon); font-size:22px}
+    .sub{margin-top:6px; text-align:center; color:var(--neon2); font-size:12px; opacity:.9}
+    .box{
+      margin-top:14px;
+      border:1px solid rgba(0,255,160,.16);
+      border-radius:18px;
+      padding:14px;
+      background:rgba(0,0,0,.22);
+    }
+    .row{display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap}
+    .pill{
+      border:1px solid rgba(0,255,160,.22);
+      border-radius:999px;
+      padding:8px 12px;
+      color:var(--muted);
+      font-size:12px;
+      background:rgba(0,0,0,.18);
+    }
+    label{display:block; margin:12px 0 6px; color:var(--muted); font-size:12px}
+    input{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(0,255,160,.22);
+      background:rgba(0,0,0,.35);
+      color:var(--text);
+      outline:none;
+      font-size:14px;
+    }
+    input:focus{border-color:rgba(0,255,160,.55)}
+    .btn{
+      width:100%;
+      margin-top:14px;
+      border:0;
+      border-radius:14px;
+      padding:12px 12px;
+      background:linear-gradient(90deg, rgba(0,255,160,.95), rgba(0,212,255,.85));
+      font-weight:900; letter-spacing:.08em; cursor:pointer;
+      color:#03100d;
+    }
+    .btn:disabled{opacity:.5; cursor:not-allowed}
+    .msg{
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(0,255,160,.18);
+      background:rgba(0,0,0,.22);
+      color:var(--text);
+      font-size:13px;
+      display:none;
+    }
+    .msg.show{display:block}
+    .danger{border-color: rgba(255,60,60,.35); color:#ffd2d2}
+    .ok{border-color: rgba(0,255,160,.25); color:#dffdf3}
+    .links{display:flex; gap:10px; margin-top:12px}
+    .linkBtn{
+      flex:1; text-align:center; padding:11px 12px; border-radius:14px;
+      border:1px solid rgba(0,255,160,.25); color:var(--neon);
+      background:transparent; text-decoration:none; font-weight:800;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="brand">PHONE GUARD</div>
+      <div class="sub">Service Request • Balance-based Buy</div>
+
+      <div class="box">
+        <div class="row">
+          <div class="pill" id="serviceName">Service: —</div>
+          <div class="pill" id="servicePrice">Price: ৳ —</div>
+          <div class="pill" id="userBal">Balance: ৳ —</div>
+        </div>
+
+        <label for="username">Username / ID</label>
+        <input id="username" placeholder="উদাহরণ: yourusername123" autocomplete="off"/>
+
+        <label for="link">Profile Link</label>
+        <input id="link" placeholder="উদাহরণ: https://facebook.com/yourprofile" autocomplete="off"/>
+
+        <button class="btn" id="buyBtn" type="button">BUY NOW</button>
+
+        <div class="msg" id="msgBox"></div>
+      </div>
+
+      <div class="links">
+        <a class="linkBtn" href="social.html">← Back</a>
+        <a class="linkBtn" href="deposit.html">Deposit</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ সবকিছু Module এ, না হলে Netlify তে click কাজ নাও করতে পারে -->
+  <script type="module">
+    import { auth, db } from "./firebase.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+    import {
+      doc, getDoc,
+      collection, addDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+    // ✅ service list (social.html এর id অনুযায়ী)
+    const SERVICES = {
+      facebook:  { name:"Facebook Service",  price:2000 },
+      whatsapp:  { name:"WhatsApp Service",  price:2000 },
+      imo:       { name:"IMO Service",       price:2000 },
+      tiktok:    { name:"TikTok Service",    price:2000 },
+      gmail:     { name:"Gmail Service",     price:2000 },
+      instagram: { name:"Instagram Service", price:2000 },
+    };
+
+    const $ = (id)=>document.getElementById(id);
+    const serviceNameEl = $("serviceName");
+    const servicePriceEl = $("servicePrice");
+    const userBalEl = $("userBal");
+    const buyBtn = $("buyBtn");
+    const msgBox = $("msgBox");
+    const usernameInp = $("username");
+    const linkInp = $("link");
+
+    function showMsg(text, type="ok"){
+      msgBox.textContent = text;
+      msgBox.className = "msg show " + (type==="danger" ? "danger" : "ok");
+    }
+
+    // ✅ URL থেকে sid নেবে: service.html?sid=facebook
+    const params = new URLSearchParams(location.search);
+    const sid = (params.get("sid") || "").trim();
+    const service = SERVICES[sid];
+
+    if(!service){
+      serviceNameEl.textContent = "Service: Invalid";
+      servicePriceEl.textContent = "Price: ৳ —";
+      showMsg("Service পাওয়া যায়নি। social.html থেকে আবার OPEN করুন।", "danger");
+      buyBtn.disabled = true;
+    }else{
+      serviceNameEl.textContent = "Service: " + service.name;
+      servicePriceEl.textContent = "Price: ৳ " + service.price;
+    }
+
+    let currentUser = null;
+    let currentBalance = 0;
+
+    // ✅ Auth check
+    onAuthStateChanged(auth, async (user)=>{
+      if(!user){
+        // লগইন না থাকলে login.html এ পাঠিয়ে দাও
+        location.href = "login.html";
+        return;
+      }
+      currentUser = user;
+
+      // ✅ users/{uid} থেকে balance পড়বে
+      try{
+        const uref = doc(db, "users", user.uid);
+        const usnap = await getDoc(uref);
+        const data = usnap.exists() ? usnap.data() : {};
+        currentBalance = Number(data.balance || 0);
+        userBalEl.textContent = "Balance: ৳ " + currentBalance;
+      }catch(e){
+        userBalEl.textContent = "Balance: ৳ ?";
+        showMsg("Balance load হয়নি। Internet/Rules check করুন।", "danger");
+      }
+    });
+
+    // ✅ Buy now click
+    buyBtn.addEventListener("click", async ()=>{
+      if(!service) return;
+      if(!currentUser){
+        showMsg("Please login first.", "danger");
+        location.href = "login.html";
+        return;
+      }
+
+      const uname = usernameInp.value.trim();
+      const link = linkInp.value.trim();
+
+      if(uname.length < 3){
+        showMsg("Username/ID ঠিকভাবে দিন।", "danger");
+        return;
+      }
+      if(link.length < 8){
+        showMsg("Profile link ঠিকভাবে দিন।", "danger");
+        return;
+      }
+
+      // ✅ balance check
+      if(currentBalance < service.price){
+        showMsg("Insufficient balance — আগে টাকা এড করুন", "danger");
+        return;
+      }
+
+      buyBtn.disabled = true;
+      buyBtn.textContent = "Submitting...";
+
+      try{
+        // ✅ Firestore: serviceRequests collection
+        const ref = await addDoc(collection(db, "serviceRequests"), {
+          sid,
+          serviceName: service.name,
+          price: service.price,
+          username: uname,
+          link,
+          status: "pending",
+          userId: currentUser.uid,
+          email: currentUser.email || "",
+          createdAt: serverTimestamp()
+        });
+
+        showMsg("Request submitted ✅", "ok");
+
+        // ✅ next page (তোমার next.html আছে)
+        setTimeout(()=>{
+          location.href = "next.html?rid=" + encodeURIComponent(ref.id);
+        }, 600);
+
+      }catch(e){
+        console.error(e);
+        showMsg("Submit হয়নি। Firestore Rules/Console Error দেখো।", "danger");
+        buyBtn.disabled = false;
+        buyBtn.textContent = "BUY NOW";
+      }
+    });
+  </script>
+</body>
+</html>
