@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Phone Guard • Home</title>
+  <style>
+    :root{
+      --bg:#050b0c;
+      --card:rgba(8,18,16,.72);
+      --line:rgba(0,255,160,.22);
+      --glow:rgba(0,255,160,.18);
+      --txt:#d9fff2;
+      --muted:rgba(217,255,242,.72);
+      --accent:#00ffa0;
+      --accent2:#00c7ff;
+      --danger:#ff4d6d;
+      --warn:#ffd166;
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--txt);
+      min-height:100vh;
+      background:
+        radial-gradient(1000px 600px at 50% -10%, rgba(0,255,160,.14), transparent 55%),
+        radial-gradient(900px 600px at 10% 20%, rgba(0,199,255,.10), transparent 55%),
+        radial-gradient(900px 700px at 90% 30%, rgba(0,255,160,.08), transparent 60%),
+        linear-gradient(180deg, #040808, #020606);
+      padding:18px 14px 28px;
+    }
+
+    .wrap{max-width:460px;margin:0 auto}
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      box-shadow:0 0 28px var(--glow), inset 0 0 22px rgba(0,255,160,.08);
+      border-radius:var(--radius);
+      padding:16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute;inset:-2px;
+      background:linear-gradient(90deg, transparent, rgba(0,255,160,.18), transparent);
+      transform:translateX(-70%);
+      animation:scan 5.5s linear infinite;
+      pointer-events:none;
+    }
+    @keyframes scan{
+      0%{transform:translateX(-70%)}
+      100%{transform:translateX(70%)}
+    }
+
+    .brand{ text-align:center; font-weight:900; letter-spacing:.22em; color:var(--accent); font-size:26px; margin-top:4px;}
+    .sub{ text-align:center; color:var(--accent2); font-size:12px; margin-top:6px; opacity:.95;}
+    .row{display:flex; gap:12px; align-items:center; justify-content:space-between; margin-top:14px;}
+    .pill{
+      flex:1;
+      padding:12px 14px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:rgba(2,8,7,.55);
+      box-shadow: inset 0 0 18px rgba(0,255,160,.06);
+      text-align:center;
+      font-weight:800;
+      letter-spacing:.06em;
+    }
+    .btn{
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(0,255,160,.18), rgba(0,255,160,.08));
+      color:var(--txt);
+      padding:12px 14px;
+      border-radius:16px;
+      font-weight:900;
+      letter-spacing:.06em;
+      cursor:pointer;
+      min-width:120px;
+      box-shadow:0 0 22px rgba(0,255,160,.10);
+    }
+    .btn:active{transform:scale(.99)}
+    .btn.primary{
+      background:linear-gradient(180deg, rgba(0,255,160,.38), rgba(0,199,255,.18));
+      border-color:rgba(0,255,160,.35);
+      color:#00130d;
+    }
+    .btn.danger{
+      border-color:rgba(255,77,109,.35);
+      background:linear-gradient(180deg, rgba(255,77,109,.22), rgba(255,77,109,.10));
+      color:var(--danger);
+      box-shadow:0 0 22px rgba(255,77,109,.08);
+      min-width:auto;
+    }
+
+    .bigbtn{
+      width:100%;
+      margin-top:12px;
+      padding:16px 14px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(2,8,7,.52);
+      box-shadow:0 0 26px rgba(0,255,160,.10), inset 0 0 18px rgba(0,255,160,.05);
+      font-weight:900;
+      letter-spacing:.08em;
+      cursor:pointer;
+      text-align:center;
+      font-size:16px;
+    }
+
+    .meta{
+      display:flex; justify-content:space-between; align-items:center;
+      margin-top:12px; gap:10px; flex-wrap:wrap;
+      color:var(--muted); font-size:12px;
+    }
+    .chip{
+      border:1px solid rgba(0,255,160,.22);
+      padding:8px 10px; border-radius:999px;
+      background:rgba(0,255,160,.06);
+      max-width:100%;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    /* screens */
+    .screen{display:none; margin-top:14px;}
+    .screen.active{display:block;}
+    .title{
+      font-weight:900;
+      letter-spacing:.10em;
+      margin:10px 2px 10px;
+      color:var(--txt);
+    }
+
+    .paybox{
+      border:1px solid var(--line);
+      background:rgba(2,8,7,.50);
+      border-radius:16px;
+      padding:12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-top:10px;
+    }
+    .payleft{display:flex; flex-direction:column; gap:4px; min-width:0;}
+    .payname{font-weight:900; color:var(--accent2); letter-spacing:.08em; font-size:13px;}
+    .paynum{font-weight:900; letter-spacing:.08em; font-size:16px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+    .copybtn{
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(0,255,160,.28);
+      background:rgba(0,255,160,.10);
+      color:var(--txt);
+      font-weight:900;
+      cursor:pointer;
+      min-width:84px;
+    }
+
+    .form{
+      margin-top:12px;
+      border-top:1px solid rgba(0,255,160,.18);
+      padding-top:12px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    label{font-size:12px; color:var(--muted); margin-left:4px}
+    input, select{
+      width:100%;
+      padding:14px 14px;
+      border-radius:16px;
+      border:1px solid rgba(0,255,160,.22);
+      background:rgba(0,0,0,.35);
+      color:var(--txt);
+      outline:none;
+      font-size:15px;
+    }
+    .hint{font-size:12px; color:var(--muted); line-height:1.4}
+    .msg{
+      margin-top:10px;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(0,255,160,.22);
+      background:rgba(0,255,160,.07);
+      display:none;
+      font-size:13px;
+      line-height:1.35;
+    }
+    .msg.show{display:block}
+    .msg.err{
+      border-color:rgba(255,77,109,.35);
+      background:rgba(255,77,109,.10);
+      color:#ffd6de;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="brand">PHONE GUARD</div>
+      <div class="sub">Secure Access • User Panel</div>
+
+      <div class="meta">
+        <div class="chip" id="userEmail">Loading...</div>
+        <div class="chip" id="userUid">UID: ...</div>
+      </div>
+
+      <div class="row">
+        <div class="pill" id="balancePill">Balance: ৳ 0</div>
+        <button class="btn primary" id="depositBtn">DEPOSIT</button>
+      </div>
+
+      <!-- MAIN SCREEN -->
+      <div class="screen active" id="screenHome">
+        <button class="bigbtn" id="socialBtn">SOCIAL MEDIA</button>
+        <button class="bigbtn" id="mobileBtn">MOBILE HACK</button>
+        <button class="btn danger" id="logoutBtn" style="width:100%; margin-top:14px; padding:14px;">LOGOUT</button>
+      </div>
+
+      <!-- DEPOSIT SCREEN -->
+      <div class="screen" id="screenDeposit">
+        <div class="title">DEPOSIT</div>
+
+        <div class="hint">
+          1) নিচের যেকোনো নম্বরে টাকা পাঠাও <br/>
+          2) তারপর Amount + Method + Last 4 digit দিয়ে Submit করো <br/>
+          <b>Note:</b> এটা manual verify হবে, তাই status “pending” থাকবে।
+        </div>
+
+        <div class="paybox">
+          <div class="payleft">
+            <div class="payname">bKash</div>
+            <div class="paynum" id="bkashNum">01881096653</div>
+          </div>
+          <button class="copybtn" data-copy="bkashNum">COPY</button>
+        </div>
+
+        <div class="paybox">
+          <div class="payleft">
+            <div class="payname">Nagad</div>
+            <div class="paynum" id="nagadNum">01980030467</div>
+          </div>
+          <button class="copybtn" data-copy="nagadNum">COPY</button>
+        </div>
+
+        <div class="paybox">
+          <div class="payleft">
+            <div class="payname">Rocket</div>
+            <div class="paynum" id="rocketNum">019800304675</div>
+          </div>
+          <button class="copybtn" data-copy="rocketNum">COPY</button>
+        </div>
+
+        <div class="form">
+          <div>
+            <label>Payment Method</label>
+            <select id="method">
+              <option value="bkash">bKash</option>
+              <option value="nagad">Nagad</option>
+              <option value="rocket">Rocket</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Amount (৳)</label>
+            <input id="amount" type="number" inputmode="numeric" min="1" placeholder="e.g. 500" />
+          </div>
+
+          <div>
+            <label>Last 4 Digit (Transaction / Sender)</label>
+            <input id="last4" type="text" inputmode="numeric" maxlength="4" placeholder="e.g. 1234" />
+            <div class="hint">শুধু 4টা digit দিবে (0-9)</div>
+          </div>
+
+          <button class="btn primary" id="submitDeposit" style="width:100%; padding:15px; border-radius:18px;">
+            SUBMIT REQUEST
+          </button>
+
+          <button class="btn" id="backBtn" style="width:100%; padding:15px; border-radius:18px;">
+            BACK TO HOME
+          </button>
+
+          <div class="msg" id="msgBox"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "./js/firebase.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+    import {
+      doc, getDoc, setDoc,
+      addDoc, collection,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+    const $ = (id) => document.getElementById(id);
+
+    const screenHome = $("screenHome");
+    const screenDeposit = $("screenDeposit");
+
+    const userEmail = $("userEmail");
+    const userUid = $("userUid");
+    const balancePill = $("balancePill");
+
+    const depositBtn = $("depositBtn");
+    const backBtn = $("backBtn");
+    const logoutBtn = $("logoutBtn");
+
+    const methodEl = $("method");
+    const amountEl = $("amount");
+    const last4El = $("last4");
+    const submitDeposit = $("submitDeposit");
+
+    const msgBox = $("msgBox");
+
+    let currentUser = null;
+    let currentBalance = 0;
+
+    function showMsg(text, isErr=false){
+      msgBox.textContent = text;
+      msgBox.classList.add("show");
+      msgBox.classList.toggle("err", isErr);
+    }
+    function clearMsg(){
+      msgBox.classList.remove("show","err");
+      msgBox.textContent = "";
+    }
+
+    function showScreen(which){
+      if(which === "home"){
+        screenHome.classList.add("active");
+        screenDeposit.classList.remove("active");
+      }else{
+        screenHome.classList.remove("active");
+        screenDeposit.classList.add("active");
+      }
+      clearMsg();
+    }
+
+    async function loadUserDoc(uid){
+      const ref = doc(db, "users", uid);
+      const snap = await getDoc(ref);
+      if(!snap.exists()){
+        // first time create user doc (safe default)
+        await setDoc(ref, {
+          balance: 0,
+          status: "active",
+          role: "user",
+          createdAt: serverTimestamp()
+        }, { merge:true });
+        currentBalance = 0;
+      }else{
+        const data = snap.data();
+        currentBalance = Number(data.balance || 0);
+      }
+      balancePill.textContent = `Balance: ৳ ${currentBalance}`;
+    }
+
+    async function loadPaymentNumbers(){
+      // settings/payments doc
+      const ref = doc(db, "settings", "payments");
+      const snap = await getDoc(ref);
+
+      if(!snap.exists()){
+        // create default once (admin later edit)
+        await setDoc(ref, {
+          bkash: "01881096653",
+          nagad: "01980030467",
+          rocket: "019800304675",
+          updatedAt: serverTimestamp()
+        }, { merge:true });
+      }else{
+        const d = snap.data();
+        $("bkashNum").textContent = d.bkash || "01881096653";
+        $("nagadNum").textContent = d.nagad || "01980030467";
+        $("rocketNum").textContent = d.rocket || "019800304675";
+      }
+    }
+
+    // Copy buttons
+    document.addEventListener("click", async (e) => {
+      const btn = e.target.closest("[data-copy]");
+      if(!btn) return;
+      const targetId = btn.getAttribute("data-copy");
+      const text = $(targetId).textContent.trim();
+      try{
+        await navigator.clipboard.writeText(text);
+        showMsg("✅ Copied: " + text);
+      }catch{
+        // fallback
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+        showMsg("✅ Copied: " + text);
+      }
+    });
+
+    depositBtn.addEventListener("click", async () => {
+      showScreen("deposit");
+      await loadPaymentNumbers();
+      // balance উপরে আগেই আছে, তাই এখানে কিছু না
+    });
+
+    backBtn.addEventListener("click", () => showScreen("home"));
+
+    logoutBtn.addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "login.html";
+    });
+
+    // Buttons (এগুলো তুমি পরে তোমার pages এ redirect করো)
+    $("socialBtn").addEventListener("click", () => {
+      // Balance check নেই (তুমি বলেছো 0 হলেও ঢুকবে)
+      window.location.href = "social.html";
+    });
+    $("mobileBtn").addEventListener("click", () => {
+      window.location.href = "mobile.html";
+    });
+
+    // Submit deposit request
+    submitDeposit.addEventListener("click", async () => {
+      clearMsg();
+      if(!currentUser) return;
+
+      const method = methodEl.value;
+      const amount = Number(amountEl.value || 0);
+      const last4 = (last4El.value || "").trim();
+
+      if(!amount || amount < 1){
+        return showMsg("❌ Amount ঠিক দাও (কমপক্ষে 1)", true);
+      }
+      if(!/^[0-9]{4}$/.test(last4)){
+        return showMsg("❌ Last 4 digit ঠিক দাও (শুধু 4টা সংখ্যা)", true);
+      }
+
+      try{
+        await addDoc(collection(db, "depositRequests"), {
+          userId: currentUser.uid,
+          email: currentUser.email || "",
+          method,
+          amount,
+          last4,
+          status: "pending",
+          createdAt: serverTimestamp()
+        });
+
+        amountEl.value = "";
+        last4El.value = "";
+
+        showMsg("✅ Deposit request submitted! Status: pending");
+      }catch(err){
+        showMsg("❌ Submit failed: " + (err?.message || "unknown"), true);
+      }
+    });
+
+    // Auth check
+    onAuthStateChanged(auth, async (u) => {
+      if(!u){
+        window.location.href = "login.html";
+        return;
+      }
+      currentUser = u;
+      userEmail.textContent = u.email || "No email";
+      userUid.textContent = "UID: " + u.uid.slice(0,10) + "...";
+
+      await loadUserDoc(u.uid);
+    });
+  </script>
+</body>
+</html>
