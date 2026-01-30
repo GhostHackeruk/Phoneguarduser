@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Phone Guard • Service</title>
+  <style>
+    :root{
+      --bg:#050b0a;
+      --card:#071311;
+      --neon:#00ffa0;
+      --neon2:#00d4ff;
+      --muted:rgba(255,255,255,.72);
+      --line:rgba(0,255,160,.18);
+      --danger:#ff4d6d;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      background:
+        radial-gradient(900px 600px at 70% 20%, rgba(0,255,160,.10), transparent 60%),
+        radial-gradient(800px 500px at 20% 80%, rgba(0,212,255,.10), transparent 55%),
+        var(--bg);
+      color:#eafff7;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+    }
+    .wrap{
+      width:min(520px, 100%);
+      background: linear-gradient(180deg, rgba(7,19,17,.88), rgba(7,19,17,.65));
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:18px;
+      box-shadow: 0 0 40px rgba(0,255,160,.10), inset 0 0 60px rgba(0,30,20,.35);
+      position:relative;
+      overflow:hidden;
+    }
+    .wrap:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: linear-gradient(120deg, transparent, rgba(0,255,160,.10), transparent);
+      transform: translateX(-40%);
+      animation: scan 3.2s linear infinite;
+      pointer-events:none;
+    }
+    @keyframes scan{
+      0%{transform:translateX(-60%)}
+      100%{transform:translateX(60%)}
+    }
+
+    .brand{
+      text-align:center;
+      font-weight:900;
+      letter-spacing:.26em;
+      color:var(--neon);
+      margin:6px 0 4px;
+      font-size:26px;
+    }
+    .sub{
+      text-align:center;
+      color:var(--neon2);
+      opacity:.9;
+      font-size:12px;
+      margin:0 0 14px;
+    }
+
+    .topbar{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:12px;
+      padding:12px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background: rgba(0,0,0,.18);
+    }
+    .pill{
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:10px 12px;
+      background: rgba(0,0,0,.15);
+      flex:1;
+      text-align:center;
+      font-weight:800;
+    }
+    .pill small{display:block; opacity:.8; font-weight:700; margin-top:2px}
+    .price{
+      color:var(--neon);
+      font-size:18px;
+      margin-top:2px;
+    }
+
+    .card{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      background: rgba(0,0,0,.14);
+    }
+    label{
+      display:block;
+      font-weight:800;
+      margin:10px 2px 6px;
+      color:#d7fff1;
+      font-size:13px;
+    }
+    input{
+      width:100%;
+      padding:14px 14px;
+      border-radius:14px;
+      border:1px solid rgba(0,255,160,.22);
+      background: rgba(0,0,0,.20);
+      color:#eafff7;
+      outline:none;
+      font-size:15px;
+    }
+    input:focus{
+      border-color: rgba(0,255,160,.55);
+      box-shadow: 0 0 0 3px rgba(0,255,160,.08);
+    }
+
+    .btn{
+      width:100%;
+      margin-top:14px;
+      padding:14px 16px;
+      border:none;
+      border-radius:14px;
+      background: linear-gradient(90deg, rgba(0,255,160,.95), rgba(0,212,255,.90));
+      color:#00120c;
+      font-weight:900;
+      letter-spacing:.08em;
+      font-size:15px;
+      cursor:pointer;
+    }
+    .btn:active{transform: translateY(1px)}
+    .btn[disabled]{opacity:.6; cursor:not-allowed}
+
+    .msg{
+      margin-top:12px;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.18);
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.35;
+      display:none;
+    }
+    .msg.ok{border-color: rgba(0,255,160,.35); color:#c7ffe9}
+    .msg.err{border-color: rgba(255,77,109,.35); color:#ffd0d8}
+    .row{
+      display:flex; gap:10px; margin-top:12px;
+    }
+    .ghost{
+      flex:1;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(0,255,160,.22);
+      background: transparent;
+      color: var(--neon);
+      font-weight:900;
+      cursor:pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">PHONE GUARD</div>
+    <div class="sub">Service Request • Balance Based Access</div>
+
+    <div class="topbar">
+      <div class="pill">
+        <div id="serviceName">Service</div>
+        <small>Selected</small>
+      </div>
+      <div class="pill">
+        <div>Price</div>
+        <div class="price">৳ <span id="servicePrice">2000</span></div>
+      </div>
+      <div class="pill">
+        <div>Balance</div>
+        <div class="price">৳ <span id="userBalance">...</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <label for="link">Link</label>
+      <input id="link" type="url" placeholder="https://example.com/profile" autocomplete="off"/>
+
+      <label for="username">Username</label>
+      <input id="username" type="text" placeholder="your_username" autocomplete="off"/>
+
+      <button class="btn" id="buyBtn">BUY NOW</button>
+
+      <div class="msg" id="msgBox"></div>
+
+      <div class="row">
+        <button class="ghost" id="backBtn">← Back</button>
+        <button class="ghost" id="depositBtn">Deposit</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "./js/firebase.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+    // ---- Config ----
+    const PRICE = 2000; // fixed price (later you can make dynamic per service)
+    const NEXT_PAGE = "next.html"; // তুমি যেই পেজে নিতে চাও, এখানে নাম দাও
+
+    // ---- UI refs ----
+    const serviceNameEl = document.getElementById("serviceName");
+    const servicePriceEl = document.getElementById("servicePrice");
+    const userBalanceEl  = document.getElementById("userBalance");
+    const buyBtn = document.getElementById("buyBtn");
+    const msgBox = document.getElementById("msgBox");
+    const linkEl = document.getElementById("link");
+    const userEl = document.getElementById("username");
+
+    document.getElementById("backBtn").addEventListener("click", () => history.back());
+    document.getElementById("depositBtn").addEventListener("click", () => location.href = "deposit.html");
+
+    function showMsg(text, type="ok"){
+      msgBox.textContent = text;
+      msgBox.className = "msg " + (type === "err" ? "err" : "ok");
+      msgBox.style.display = "block";
+    }
+    function hideMsg(){ msgBox.style.display="none"; }
+
+    // ---- Read service name from URL: open.html?service=facebook ----
+    const params = new URLSearchParams(location.search);
+    const service = (params.get("service") || "service").toLowerCase();
+    const niceName = service.charAt(0).toUpperCase() + service.slice(1);
+    serviceNameEl.textContent = niceName + " Service";
+    servicePriceEl.textContent = PRICE;
+
+    let currentUser = null;
+    let userBalance = 0;
+
+    buyBtn.disabled = true;
+
+    async function loadBalance(uid){
+      // users/{uid} doc must contain: balance (number)
+      const uref = doc(db, "users", uid);
+      const snap = await getDoc(uref);
+      if (!snap.exists()) return 0;
+      const data = snap.data();
+      const b = Number(data.balance || 0);
+      return isNaN(b) ? 0 : b;
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if(!user){
+        // not logged in -> back to login
+        location.href = "login.html";
+        return;
+      }
+      currentUser = user;
+
+      try{
+        userBalance = await loadBalance(user.uid);
+        userBalanceEl.textContent = userBalance.toString();
+        buyBtn.disabled = false;
+      }catch(e){
+        console.error(e);
+        userBalanceEl.textContent = "0";
+        buyBtn.disabled = false;
+        showMsg("Balance load করতে সমস্যা হয়েছে. পরে আবার চেষ্টা করুন.", "err");
+      }
+    });
+
+    buyBtn.addEventListener("click", () => {
+      hideMsg();
+
+      const link = (linkEl.value || "").trim();
+      const uname = (userEl.value || "").trim();
+
+      if(!link || !uname){
+        showMsg("Link এবং Username দুটোই দিতে হবে.", "err");
+        return;
+      }
+
+      // balance check
+      if(userBalance < PRICE){
+        showMsg("Insufficient balance — আগে টাকা এড করুন", "err");
+        return;
+      }
+
+      // ✅ Allowed: just move to next page
+      // Pass info via sessionStorage (safer than URL)
+      sessionStorage.setItem("service", service);
+      sessionStorage.setItem("servicePrice", String(PRICE));
+      sessionStorage.setItem("serviceLink", link);
+      sessionStorage.setItem("serviceUsername", uname);
+
+      // go next
+      location.href = `${NEXT_PAGE}?service=${encodeURIComponent(service)}`;
+    });
+  </script>
+</body>
+</html>
