@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Phone Guard • Login</title>
+  <style>
+    :root{
+      --bg:#050b09;
+      --card:#07120e;
+      --neon:#00ffa0;
+      --neon2:#00d4ff;
+      --text:#d9fff1;
+      --muted:rgba(217,255,241,.75);
+      --line:rgba(0,255,160,.22);
+      --shadow: 0 0 40px rgba(0,255,160,.10), inset 0 0 60px rgba(0,30,20,.35);
+      --r:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:
+        radial-gradient(1200px 600px at 30% 10%, rgba(0,255,160,.08), transparent 60%),
+        radial-gradient(900px 500px at 80% 30%, rgba(0,212,255,.08), transparent 55%),
+        linear-gradient(180deg, #020604, #050b09 55%, #020604);
+      color:var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      padding:18px;
+    }
+    .wrap{width:min(520px, 100%);}
+    .card{
+      background: rgba(7,18,14,.72);
+      border:1px solid var(--line);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+      overflow:hidden;
+      position:relative;
+      padding:18px;
+    }
+    .card:before{
+      content:"";
+      position:absolute; inset:-2px;
+      border-radius: calc(var(--r) + 2px);
+      background: linear-gradient(90deg, transparent, rgba(0,255,160,.25), transparent);
+      opacity:.25;
+      pointer-events:none;
+    }
+    .brand{
+      text-align:center;
+      font-weight:900;
+      letter-spacing:.26em;
+      color:var(--neon);
+      font-size:28px;
+      margin-top:6px;
+    }
+    .sub{
+      text-align:center;
+      color:var(--neon2);
+      font-size:12px;
+      margin-top:6px;
+      opacity:.9;
+      letter-spacing:.12em;
+    }
+
+    #loader{margin-top:18px; padding:14px; border:1px solid rgba(0,255,160,.14); border-radius:16px;}
+    .loadtxt{font-size:12px; color:var(--muted); text-align:center; letter-spacing:.08em;}
+    .scanline{height:10px; border-radius:99px; border:1px solid rgba(0,255,160,.25); margin:14px 0; overflow:hidden;}
+    .scanfill{height:100%; width:0%; background:linear-gradient(90deg, rgba(0,212,255,.65), rgba(0,255,160,.9)); animation:load 1.4s linear forwards;}
+    @keyframes load{to{width:100%}}
+    .blink{animation:blink 1s steps(1) infinite}
+    @keyframes blink{50%{opacity:.35}}
+
+    .hidden{display:none !important;}
+
+    .tabs{
+      display:flex;
+      gap:10px;
+      margin-top:18px;
+      border-bottom:1px solid rgba(0,255,160,.16);
+    }
+    .tab{
+      flex:1;
+      text-align:center;
+      padding:12px 10px;
+      cursor:pointer;
+      color:rgba(217,255,241,.75);
+      letter-spacing:.18em;
+      font-weight:800;
+      border-radius:14px 14px 0 0;
+      user-select:none;
+      position:relative;
+    }
+    .tab.active{
+      color:var(--neon);
+    }
+    .tab.active:after{
+      content:"";
+      position:absolute; left:12px; right:12px; bottom:-1px;
+      height:3px;
+      background:linear-gradient(90deg, rgba(0,212,255,.4), rgba(0,255,160,.95));
+      border-radius:99px;
+      box-shadow: 0 0 18px rgba(0,255,160,.35);
+    }
+
+    form{display:none; margin-top:16px;}
+    form.active{display:block;}
+
+    .field{margin:12px 0;}
+    label{display:block; font-size:12px; color:var(--muted); letter-spacing:.12em; margin-bottom:8px;}
+    input{
+      width:100%;
+      padding:14px 14px;
+      border-radius:16px;
+      border:1px solid rgba(0,255,160,.22);
+      background: rgba(0,12,9,.55);
+      color:var(--text);
+      outline:none;
+      font-size:14px;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.25);
+    }
+    input:focus{
+      border-color: rgba(0,255,160,.55);
+      box-shadow: 0 0 0 3px rgba(0,255,160,.10);
+    }
+
+    .btn{
+      width:100%;
+      border:0;
+      cursor:pointer;
+      padding:14px 16px;
+      border-radius:16px;
+      font-weight:900;
+      letter-spacing:.16em;
+      margin-top:8px;
+      background: linear-gradient(90deg, rgba(0,212,255,.85), rgba(0,255,160,.95));
+      color:#00120b;
+      box-shadow: 0 10px 30px rgba(0,255,160,.15);
+    }
+    .btn:active{transform:translateY(1px)}
+    .msg{
+      margin-top:12px;
+      font-size:12px;
+      letter-spacing:.08em;
+      text-align:center;
+      min-height:18px;
+    }
+    .msg.ok{color:rgba(0,255,160,.95)}
+    .msg.err{color:rgba(255,80,120,.95)}
+    .small{
+      text-align:center;
+      margin-top:10px;
+      font-size:11px;
+      color:rgba(217,255,241,.55);
+      letter-spacing:.06em;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="brand">PHONE GUARD</div>
+      <div class="sub">Secure Access • Futuristic Panel</div>
+
+      <div id="loader">
+        <div class="loadtxt"><span class="blink">Initializing</span> secure session…</div>
+        <div class="scanline"><div class="scanfill"></div></div>
+        <div class="loadtxt">Verifying modules • Encrypting channel</div>
+      </div>
+
+      <div id="auth" class="hidden">
+        <div class="tabs">
+          <div class="tab active" data-tab="login">LOGIN</div>
+          <div class="tab" data-tab="register">REGISTER</div>
+        </div>
+
+        <!-- LOGIN -->
+        <form id="loginForm" class="active">
+          <div class="field">
+            <label>Email</label>
+            <input id="loginEmail" type="email" placeholder="yourname@gmail.com" />
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input id="loginPass" type="password" placeholder="••••••••" />
+          </div>
+          <button class="btn" id="loginBtn" type="button">LOGIN</button>
+          <div class="msg" id="loginMsg"></div>
+          <div class="small">Login success হলে home.html এ যাবে</div>
+        </form>
+
+        <!-- REGISTER -->
+        <form id="registerForm">
+          <div class="field">
+            <label>Name</label>
+            <input id="regName" type="text" placeholder="Your name" />
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input id="regEmail" type="email" placeholder="yourname@gmail.com" />
+          </div>
+          <div class="field">
+            <label>Password (min 6)</label>
+            <input id="regPass" type="password" placeholder="••••••••" />
+          </div>
+          <button class="btn" id="regBtn" type="button">CREATE ACCOUNT</button>
+          <div class="msg" id="regMsg"></div>
+          <div class="small">Register success হলে home.html এ যাবে</div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Firebase + Auth + Firestore -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+    // ✅ তোমার Firebase config (phone-guard-user-new)
+    const firebaseConfig = {
+      apiKey: "AIzaSyD_eOcX7P77xLFnOPf3yWk3P-Qyhbyab5E",
+      authDomain: "phone-guard-user-new.firebaseapp.com",
+      projectId: "phone-guard-user-new",
+      storageBucket: "phone-guard-user-new.firebasestorage.app",
+      messagingSenderId: "764033397081",
+      appId: "1:764033397081:web:182fd2c7cfc663e36c5c48"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // UI
+    const loader = document.getElementById("loader");
+    const authBox = document.getElementById("auth");
+
+    const loginMsg = document.getElementById("loginMsg");
+    const regMsg = document.getElementById("regMsg");
+
+    const setMsg = (el, text, ok) => {
+      el.textContent = text || "";
+      el.className = "msg " + (ok ? "ok" : "err");
+    };
+
+    // show auth after loader
+    setTimeout(() => {
+      loader.classList.add("hidden");
+      authBox.classList.remove("hidden");
+    }, 1400);
+
+    // Tabs
+    document.querySelectorAll(".tab").forEach(t => {
+      t.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+        t.classList.add("active");
+        const name = t.dataset.tab;
+
+        document.getElementById("loginForm").classList.toggle("active", name === "login");
+        document.getElementById("registerForm").classList.toggle("active", name === "register");
+
+        setMsg(loginMsg, "", true);
+        setMsg(regMsg, "", true);
+      });
+    });
+
+    // If already logged in => go home
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // ✅ Netlify তে login.html + home.html থাকলে কাজ করবে
+        window.location.href = "home.html";
+      }
+    });
+
+    // ✅ LOGIN
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      try {
+        const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+        const pass = document.getElementById("loginPass").value;
+
+        if (!email || !pass) {
+          setMsg(loginMsg, "Email + Password দাও", false);
+          return;
+        }
+
+        setMsg(loginMsg, "Checking…", true);
+        await signInWithEmailAndPassword(auth, email, pass);
+
+        setMsg(loginMsg, "Login success ✅", true);
+        window.location.href = "home.html";
+      } catch (err) {
+        setMsg(loginMsg, "Wrong Email or Password ❌", false);
+      }
+    });
+
+    // ✅ REGISTER
+    document.getElementById("regBtn").addEventListener("click", async () => {
+      try {
+        const name = document.getElementById("regName").value.trim();
+        const email = document.getElementById("regEmail").value.trim().toLowerCase();
+        const pass = document.getElementById("regPass").value;
+
+        if (!name || !email || !pass) {
+          setMsg(regMsg, "Name + Email + Password লাগবে", false);
+          return;
+        }
+        if (pass.length < 6) {
+          setMsg(regMsg, "Password min 6", false);
+          return;
+        }
+
+        setMsg(regMsg, "Creating…", true);
+
+        const cred = await createUserWithEmailAndPassword(auth, email, pass);
+
+        // ✅ Firestore user profile
+        await setDoc(doc(db, "users", cred.user.uid), {
+          name,
+          email,
+          role: "user",
+          balance: 0,
+          status: "active",
+          createdAt: serverTimestamp()
+        }, { merge: true });
+
+        setMsg(regMsg, "Account created ✅", true);
+        window.location.href = "home.html";
+      } catch (err) {
+        // common clean messages
+        const msg =
+          err?.code === "auth/email-already-in-use" ? "Email already used ❌" :
+          err?.code === "auth/invalid-email" ? "Invalid Email ❌" :
+          err?.code === "auth/weak-password" ? "Weak Password (min 6) ❌" :
+          (err?.message || "Register failed ❌");
+
+        setMsg(regMsg, msg, false);
+        console.log("REGISTER ERROR:", err);
+      }
+    });
+  </script>
+</body>
+</html>
