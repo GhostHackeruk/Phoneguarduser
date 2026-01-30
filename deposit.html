@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Deposit • Phone Guard</title>
+  <style>
+    :root{
+      --bg:#06110c; --panel:rgba(7,35,25,.55); --line:rgba(0,255,160,.22);
+      --text:#dffdf3; --muted:#8debd0; --neon:#00ffa0; --blue:#00d4ff; --danger:#ff5b7c;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto;
+      color:var(--text);
+      background:
+        radial-gradient(900px 600px at 20% 10%, rgba(0,255,160,.18), transparent 60%),
+        radial-gradient(800px 500px at 90% 30%, rgba(0,212,255,.16), transparent 60%),
+        radial-gradient(900px 700px at 50% 90%, rgba(0,255,160,.10), transparent 65%),
+        var(--bg);
+      padding:16px 14px 28px;
+    }
+    .wrap{max-width:520px;margin:0 auto}
+    .card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      box-shadow: 0 0 34px rgba(0,255,160,.10), inset 0 0 54px rgba(0,40,30,.35);
+      border-radius:18px;
+      padding:14px;
+      backdrop-filter: blur(10px);
+    }
+    .top{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin-bottom:10px;
+    }
+    .title{
+      font-weight:900; letter-spacing:.22em; color:var(--neon);
+      text-align:center; margin:8px 0 2px; font-size:22px;
+    }
+    .sub{ text-align:center; color:var(--blue); opacity:.9; font-size:12px; margin:0 0 10px}
+    .btn{
+      border:1px solid rgba(0,255,160,.35);
+      background: rgba(0,0,0,.25);
+      color:var(--text);
+      border-radius:14px;
+      padding:10px 12px;
+      font-weight:800;
+      cursor:pointer;
+      min-height:44px;
+    }
+    .btn:active{transform:scale(.99)}
+    .btnPrimary{
+      background: linear-gradient(90deg, rgba(0,212,255,.85), rgba(0,255,160,.85));
+      border:none; color:#022016;
+    }
+    .btnDanger{
+      border:1px solid rgba(255,91,124,.45);
+      color: var(--danger);
+      background: rgba(255,91,124,.06);
+    }
+    .row{display:flex; gap:10px; flex-wrap:wrap}
+    .row > *{flex:1}
+    .pill{
+      border:1px solid rgba(0,255,160,.25);
+      border-radius:14px;
+      padding:10px 12px;
+      background: rgba(0,0,0,.18);
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+      min-height:44px;
+    }
+    .kv{display:flex; flex-direction:column; gap:2px}
+    .k{font-size:12px; color:var(--muted)}
+    .v{font-weight:900; letter-spacing:.04em}
+    .copy{
+      padding:8px 10px; border-radius:12px;
+      border:1px solid rgba(0,255,160,.35);
+      background: rgba(0,0,0,.25);
+      color: var(--neon);
+      font-weight:900;
+      min-width:78px;
+      cursor:pointer;
+    }
+    label{display:block; color:var(--muted); font-size:12px; margin:12px 2px 6px}
+    input, select{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(0,255,160,.22);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      outline:none;
+      min-height:44px;
+    }
+    .hint{font-size:12px; color:rgba(223,253,243,.78); margin:8px 2px 0}
+    .msg{
+      margin-top:10px;
+      border:1px dashed rgba(0,255,160,.35);
+      background: rgba(0,0,0,.20);
+      border-radius:14px;
+      padding:10px 12px;
+      font-size:13px;
+      min-height:42px;
+      display:flex; align-items:center;
+    }
+    .muted{opacity:.85}
+    .tiny{font-size:11px; opacity:.8; margin-top:10px; text-align:center}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="top">
+        <button class="btn" id="backBtn">← Back</button>
+        <button class="btn btnDanger" id="logoutBtn">Logout</button>
+      </div>
+
+      <div class="title">DEPOSIT</div>
+      <p class="sub">bKash / Nagad / Rocket • Copy number • Submit request</p>
+
+      <div class="row" style="margin-bottom:10px">
+        <div class="pill">
+          <div class="kv">
+            <div class="k">Logged in as</div>
+            <div class="v" id="userEmail">Loading...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pill" style="margin-bottom:10px">
+        <div class="kv">
+          <div class="k">bKash</div>
+          <div class="v" id="bkashNo">Loading...</div>
+        </div>
+        <button class="copy" data-copy="bkashNo">COPY</button>
+      </div>
+
+      <div class="pill" style="margin-bottom:10px">
+        <div class="kv">
+          <div class="k">Nagad</div>
+          <div class="v" id="nagadNo">Loading...</div>
+        </div>
+        <button class="copy" data-copy="nagadNo">COPY</button>
+      </div>
+
+      <div class="pill" style="margin-bottom:10px">
+        <div class="kv">
+          <div class="k">Rocket</div>
+          <div class="v" id="rocketNo">Loading...</div>
+        </div>
+        <button class="copy" data-copy="rocketNo">COPY</button>
+      </div>
+
+      <form id="depositForm" autocomplete="off">
+        <label>Method</label>
+        <select id="method" required>
+          <option value="bKash">bKash</option>
+          <option value="Nagad">Nagad</option>
+          <option value="Rocket">Rocket</option>
+        </select>
+
+        <label>Amount (৳)</label>
+        <input id="amount" type="number" inputmode="numeric" min="10" placeholder="e.g. 500" required />
+
+        <label>Transaction Last 4 Digit</label>
+        <input id="last4" type="text" inputmode="numeric" maxlength="4" placeholder="e.g. 1234" required />
+
+        <div class="hint">Tip: amount ≥ 10, last4 must be 4 digits.</div>
+
+        <div style="margin-top:12px" class="row">
+          <button class="btn btnPrimary" id="submitBtn" type="submit">SUBMIT REQUEST</button>
+        </div>
+      </form>
+
+      <div class="msg" id="msgBox"><span class="muted">Ready.</span></div>
+      <div class="tiny">If submit না যায়, Netlify deploy folder/path ভুল হতে পারে।</div>
+    </div>
+  </div>
+
+  <script type="module">
+    // ===== Firebase (Web modular) =====
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD_eOcX7P77xLFnOPf3yWk3P-Qyhbyab5E",
+      authDomain: "phone-guard-user-new.firebaseapp.com",
+      projectId: "phone-guard-user-new",
+      storageBucket: "phone-guard-user-new.firebasestorage.app",
+      messagingSenderId: "764033397081",
+      appId: "1:764033397081:web:182fd2c7cfc663e36c5c48"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const $ = (id) => document.getElementById(id);
+    const msg = (t) => { $("msgBox").innerHTML = t; };
+
+    // Copy helper (works on mobile + fallback)
+    async function copyText(text){
+      try{
+        if (navigator.clipboard && window.isSecureContext){
+          await navigator.clipboard.writeText(text);
+          return true;
+        }
+      }catch(e){}
+      // fallback
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      let ok = false;
+      try{ ok = document.execCommand("copy"); }catch(e){}
+      document.body.removeChild(ta);
+      return ok;
+    }
+
+    // Load payment numbers from Firestore: settings/payments
+    async function loadPayments(){
+      try{
+        const snap = await getDoc(doc(db, "settings", "payments"));
+        const data = snap.exists() ? snap.data() : null;
+
+        $("bkashNo").textContent  = data?.bkash  || "01881096653";
+        $("nagadNo").textContent  = data?.nagad  || "01980030467";
+        $("rocketNo").textContent = data?.rocket || "019800304675";
+
+        msg("✅ Payment numbers loaded.");
+      }catch(err){
+        console.error(err);
+        // fallback to default
+        $("bkashNo").textContent  = "01881096653";
+        $("nagadNo").textContent  = "01980030467";
+        $("rocketNo").textContent = "019800304675";
+        msg("⚠️ Settings load failed. Using default numbers.");
+      }
+    }
+
+    // Auth gate (Netlify তে currentUser null issue solve)
+    let currentUser = null;
+    onAuthStateChanged(auth, async (user) => {
+      if (!user){
+        // Not logged in -> go login
+        location.href = "login.html";
+        return;
+      }
+      currentUser = user;
+      $("userEmail").textContent = user.email || user.uid;
+      await loadPayments();
+    });
+
+    // Copy buttons
+    document.querySelectorAll(".copy").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const targetId = btn.getAttribute("data-copy");
+        const text = $(targetId).textContent.trim();
+        const ok = await copyText(text);
+        msg(ok ? `✅ Copied: <b>${text}</b>` : "❌ Copy failed (browser restriction).");
+      });
+    });
+
+    // Back + Logout
+    $("backBtn").addEventListener("click", ()=> history.back());
+    $("logoutBtn").addEventListener("click", async ()=>{
+      await signOut(auth);
+      location.href = "login.html";
+    });
+
+    // Submit deposit request
+    $("depositForm").addEventListener("submit", async (e)=>{
+      e.preventDefault();
+
+      if (!currentUser){
+        msg("❌ Not logged in. Redirecting...");
+        location.href = "login.html";
+        return;
+      }
+
+      const method = $("method").value.trim();
+      const amount = Number($("amount").value);
+      const last4  = $("last4").value.trim();
+
+      if (!Number.isFinite(amount) || amount < 10){
+        msg("❌ Amount কমপক্ষে 10 হতে হবে.");
+        return;
+      }
+      if (!/^[0-9]{4}$/.test(last4)){
+        msg("❌ Last 4 digit ঠিক 4 সংখ্যা হতে হবে (1234).");
+        return;
+      }
+
+      const submitBtn = $("submitBtn");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting...";
+
+      try{
+        await addDoc(collection(db, "depositRequests"), {
+          userId: currentUser.uid,
+          email: currentUser.email || "",
+          method,
+          amount,
+          last4,
+          status: "pending",
+          createdAt: serverTimestamp()
+        });
+
+        msg("✅ Submitted! Your request is pending.");
+        $("depositForm").reset();
+      }catch(err){
+        console.error(err);
+        msg("❌ Submit failed: " + (err?.message || err));
+      }finally{
+        submitBtn.disabled = false;
+        submitBtn.textContent = "SUBMIT REQUEST";
+      }
+    });
+  </script>
+</body>
+</html>
