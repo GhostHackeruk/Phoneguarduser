@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PHONE GUARD • Admin Panel</title>
+  <style>
+    :root{
+      --bg:#06110f;
+      --card:#071a16;
+      --stroke:#0f3a33;
+      --txt:#d9fff3;
+      --muted:#83cdbb;
+      --accent:#17f4c0;
+      --accent2:#0fb4ff;
+      --danger:#ff5a6a;
+      --warn:#ffd166;
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --r:18px;
+      --pad:14px;
+      --max:980px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: radial-gradient(1200px 600px at 30% 10%, rgba(23,244,192,.18), transparent 55%),
+                  radial-gradient(900px 600px at 90% 30%, rgba(15,180,255,.14), transparent 55%),
+                  var(--bg);
+      color:var(--txt);
+    }
+    a{color:var(--accent)}
+    .wrap{max-width:var(--max); margin:0 auto; padding:18px 12px 60px}
+    .brand{
+      background: rgba(7,26,22,.72);
+      border:1px solid rgba(15,58,51,.9);
+      border-radius: 24px;
+      padding:18px 16px;
+      box-shadow: var(--shadow);
+      text-align:center;
+    }
+    .brand h1{
+      margin:0;
+      letter-spacing:.32em;
+      font-weight:800;
+      font-size: clamp(26px, 5vw, 44px);
+      color: var(--accent);
+      text-transform:uppercase;
+    }
+    .brand p{
+      margin:8px 0 0;
+      color: var(--muted);
+      letter-spacing:.12em;
+      font-size: 12px;
+      text-transform:uppercase;
+    }
+
+    .grid{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+    }
+    @media(min-width:900px){
+      .grid{grid-template-columns: 1fr 1fr}
+    }
+    .card{
+      background: rgba(7,26,22,.78);
+      border:1px solid rgba(15,58,51,.95);
+      border-radius: var(--r);
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+    .card h2{
+      margin:0 0 10px;
+      color: var(--accent);
+      letter-spacing:.18em;
+      text-transform: uppercase;
+      font-size: 13px;
+    }
+    .row{display:flex; gap:10px; flex-wrap:wrap}
+    .row > *{flex:1}
+    .input{
+      width:100%;
+      padding:12px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(15,58,51,.95);
+      background: rgba(3,12,10,.65);
+      color: var(--txt);
+      outline:none;
+      font-size: 15px;
+    }
+    .input::placeholder{color: rgba(131,205,187,.55)}
+    .btn{
+      padding:12px 14px;
+      border-radius: 14px;
+      border:1px solid rgba(15,58,51,.95);
+      background: rgba(10,40,34,.75);
+      color: var(--txt);
+      font-weight: 800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      cursor:pointer;
+      width:100%;
+    }
+    .btn.primary{
+      background: linear-gradient(90deg, rgba(23,244,192,.95), rgba(15,180,255,.72));
+      border: 0;
+      color:#02110d;
+    }
+    .btn.danger{background: rgba(255,90,106,.16); border-color: rgba(255,90,106,.35); color:#ffd2d7;}
+    .btn.ghost{background: rgba(3,12,10,.35)}
+    .btn.small{padding:9px 10px; border-radius: 12px; font-size:12px; width:auto}
+    .pill{
+      padding:10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(15,58,51,.95);
+      background: rgba(3,12,10,.55);
+      color: var(--muted);
+      font-size: 13px;
+      width:100%;
+    }
+    .status{
+      margin-top:10px;
+      padding:12px;
+      border-radius: 14px;
+      border:1px solid rgba(15,58,51,.95);
+      background: rgba(3,12,10,.55);
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono";
+      font-size: 13px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .status.err{border-color: rgba(255,90,106,.35); color:#ffd2d7; background: rgba(255,90,106,.08)}
+    .status.ok{border-color: rgba(23,244,192,.32); color:#cafff2; background: rgba(23,244,192,.06)}
+    .hide{display:none !important}
+
+    table{
+      width:100%;
+      border-collapse: collapse;
+      overflow:hidden;
+      border-radius: 14px;
+      border:1px solid rgba(15,58,51,.95);
+      background: rgba(3,12,10,.38);
+    }
+    th, td{
+      text-align:left;
+      padding:10px 10px;
+      border-bottom:1px solid rgba(15,58,51,.65);
+      vertical-align: top;
+      font-size: 13px;
+    }
+    th{color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.1em; font-size:11px}
+    tr:last-child td{border-bottom:0}
+    .actions{display:flex; gap:8px; flex-wrap:wrap}
+    .tag{display:inline-block; padding:4px 8px; border-radius:999px; font-size:11px; border:1px solid rgba(15,58,51,.9); color:var(--muted)}
+    .footerNote{margin-top:10px; color: rgba(131,205,187,.65); font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <h1>PHONE GUARD</h1>
+      <p>Admin Panel • Balance • Payments • Notifications • Approvals</p>
+    </div>
+
+    <!-- AUTH CARD -->
+    <div class="grid">
+      <div class="card">
+        <h2>Admin Login (Firebase Auth)</h2>
+        <div class="row">
+          <input id="email" class="input" type="email" placeholder="Admin email" autocomplete="email">
+          <input id="pass" class="input" type="password" placeholder="Admin password" autocomplete="current-password">
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button id="btnLogin" class="btn primary">Login</button>
+          <button id="btnLogout" class="btn danger">Logout</button>
+          <button id="btnRefresh" class="btn ghost">Refresh</button>
+        </div>
+        <div id="authInfo" class="pill" style="margin-top:10px">Status: checking…</div>
+        <div id="authMsg" class="status">Ready.</div>
+        <div class="footerNote">
+          ✅ Admin হতে হলে Firestore এ <b>admins/{UID}</b> doc থাকতে হবে (Doc ID = UID)।
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>User Balance (Add / Set / Check)</h2>
+        <input id="userUid" class="input" placeholder="User UID (Authentication থেকে)" />
+        <input id="amount" class="input" placeholder="Amount (e.g. 500)" inputmode="numeric" style="margin-top:10px" />
+        <div class="row" style="margin-top:10px">
+          <button id="btnBalCheck" class="btn">Check</button>
+          <button id="btnBalAdd" class="btn primary">Add</button>
+          <button id="btnBalSet" class="btn">Set</button>
+        </div>
+        <div id="balMsg" class="status">Firestore path: users/{uid}.balance</div>
+      </div>
+    </div>
+
+    <!-- PAYMENTS + NOTIFICATIONS -->
+    <div class="grid">
+      <div class="card">
+        <h2>Payment Numbers (settings/payment)</h2>
+        <input id="bkash" class="input" placeholder="bKash number" />
+        <input id="nagad" class="input" placeholder="Nagad number" style="margin-top:10px"/>
+        <input id="rocket" class="input" placeholder="Rocket number" style="margin-top:10px"/>
+        <div class="row" style="margin-top:10px">
+          <button id="btnPayLoad" class="btn">Load</button>
+          <button id="btnPaySave" class="btn primary">Save</button>
+        </div>
+        <div id="payMsg" class="status">Firestore doc: settings/payment</div>
+      </div>
+
+      <div class="card">
+        <h2>Send Notification (notifications)</h2>
+        <input id="nTitle" class="input" placeholder="Title (e.g. Update)" />
+        <input id="nBody" class="input" placeholder="Message (e.g. Your request approved)" style="margin-top:10px" />
+        <div class="row" style="margin-top:10px">
+          <button id="btnSendNotif" class="btn primary">Send</button>
+        </div>
+        <div id="notifMsg" class="status">Writes: notifications collection (auto ID)</div>
+      </div>
+    </div>
+
+    <!-- APPROVALS -->
+    <div class="grid">
+      <div class="card">
+        <h2>Pending Deposit Requests (depositRequests)</h2>
+        <div class="row">
+          <button id="btnLoadDeposits" class="btn">Load Pending</button>
+        </div>
+        <div id="depMsg" class="status">Query: depositRequests where status == "pending"</div>
+        <div style="margin-top:10px; overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>ReqID</th><th>UserUID</th><th>Amount</th><th>Method</th><th>TxID</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="depRows">
+              <tr><td colspan="6" style="color:rgba(131,205,187,.65)">No data loaded.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Pending Purchase Requests (purchaseRequests)</h2>
+        <div class="row">
+          <button id="btnLoadPurchases" class="btn">Load Pending</button>
+        </div>
+        <div id="purMsg" class="status">Query: purchaseRequests where status == "pending"</div>
+        <div style="margin-top:10px; overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>ReqID</th><th>UserUID</th><th>Service</th><th>Cost</th><th>Phone</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="purRows">
+              <tr><td colspan="6" style="color:rgba(131,205,187,.65)">No data loaded.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="./admin.js"></script>
+</body>
+</html>
