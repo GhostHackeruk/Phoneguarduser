@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PHONE GUARD — Admin</title>
+  <style>
+    :root{
+      --bg:#03110f;
+      --card:#05201b;
+      --card2:#031815;
+      --glow:#00ffc8;
+      --glow2:#00d2ff;
+      --txt:#d9fff6;
+      --muted:#89cfc0;
+      --danger:#ff4d6d;
+      --ok:#28f59a;
+      --br:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      color:var(--txt);
+      background:
+        radial-gradient(1200px 700px at 50% -200px, rgba(0,255,200,.18), transparent 60%),
+        radial-gradient(900px 600px at 120% 20%, rgba(0,210,255,.16), transparent 55%),
+        linear-gradient(180deg, #020a09, var(--bg));
+      min-height:100vh;
+      padding:18px 14px 40px;
+    }
+    .wrap{max-width:980px;margin:0 auto}
+    .hero{
+      border:1px solid rgba(0,255,200,.18);
+      background: linear-gradient(180deg, rgba(0,255,200,.06), rgba(0,0,0,.15));
+      border-radius: 26px;
+      padding:22px 18px;
+      box-shadow: 0 0 30px rgba(0,255,200,.06);
+      text-align:center;
+    }
+    h1{
+      margin:0;
+      letter-spacing:.45em;
+      font-size: clamp(22px, 4vw, 36px);
+      color: var(--glow);
+      text-shadow: 0 0 18px rgba(0,255,200,.25);
+    }
+    .sub{margin:10px 0 0;color:var(--muted);font-size:13px}
+    .grid{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns:1fr;
+      gap:14px;
+    }
+    .card{
+      border:1px solid rgba(0,255,200,.14);
+      background: linear-gradient(180deg, rgba(0,255,200,.05), rgba(0,0,0,.18));
+      border-radius: var(--br);
+      padding:14px;
+    }
+    .card h2{
+      margin:0 0 10px;
+      letter-spacing:.18em;
+      font-size:15px;
+      color: rgba(0,255,200,.92);
+    }
+    .row{
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+    .row > *{flex:1}
+    input, textarea, select{
+      width:100%;
+      border-radius: 14px;
+      border:1px solid rgba(0,255,200,.14);
+      padding:12px 12px;
+      background: rgba(0,0,0,.35);
+      color: var(--txt);
+      outline:none;
+      font-size:14px;
+    }
+    textarea{min-height:90px;resize:vertical}
+    input::placeholder, textarea::placeholder{color: rgba(137,207,192,.65)}
+    .btns{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
+    button{
+      border:none;
+      border-radius: 14px;
+      padding:12px 14px;
+      font-weight:700;
+      letter-spacing:.08em;
+      cursor:pointer;
+      background: rgba(0,255,200,.12);
+      color: var(--txt);
+      border:1px solid rgba(0,255,200,.2);
+    }
+    button.primary{
+      background: linear-gradient(90deg, rgba(0,255,200,.85), rgba(0,210,255,.7));
+      color:#04211b;
+      border: none;
+    }
+    button.danger{
+      background: rgba(255,77,109,.12);
+      border:1px solid rgba(255,77,109,.35);
+      color: #ffd7df;
+    }
+    .pill{
+      display:inline-block;
+      padding:8px 10px;
+      border:1px solid rgba(0,255,200,.14);
+      border-radius: 999px;
+      font-size:12px;
+      color: var(--muted);
+      background: rgba(0,0,0,.25);
+    }
+    .status{
+      margin-top:10px;
+      padding:12px;
+      border-radius: 14px;
+      border:1px solid rgba(0,255,200,.14);
+      background: rgba(0,0,0,.25);
+      color: var(--muted);
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+    .status.ok{border-color:rgba(40,245,154,.35); color:#bfffe6}
+    .status.bad{border-color:rgba(255,77,109,.35); color:#ffd7df}
+    .hide{display:none !important}
+    table{
+      width:100%;
+      border-collapse: collapse;
+      overflow:hidden;
+      border-radius: 14px;
+      border:1px solid rgba(0,255,200,.12);
+      background: rgba(0,0,0,.22);
+    }
+    th, td{
+      padding:10px;
+      border-bottom:1px solid rgba(0,255,200,.08);
+      font-size:13px;
+      text-align:left;
+      vertical-align:top;
+    }
+    th{color: rgba(0,255,200,.92); font-weight:800}
+    .small{font-size:12px;color:var(--muted)}
+    .two{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:14px;
+    }
+    @media(min-width: 860px){
+      .grid{grid-template-columns: 1fr}
+      .two{grid-template-columns: 1.05fr .95fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>PHONE GUARD</h1>
+      <div class="sub">Admin Panel • Balance • Payments • Notifications • Approvals</div>
+    </div>
+
+    <div class="grid">
+      <div class="card" id="cardAuth">
+        <h2>ADMIN LOGIN (FIREBASE AUTH)</h2>
+        <div class="row">
+          <input id="email" placeholder="Admin email" autocomplete="username" />
+          <input id="pass" placeholder="Password" type="password" autocomplete="current-password" />
+        </div>
+        <div class="btns">
+          <button class="primary" id="btnLogin">LOGIN</button>
+          <button class="danger" id="btnLogout">LOGOUT</button>
+          <button id="btnRefresh">REFRESH</button>
+        </div>
+
+        <div class="status" id="authInfo">Not signed in.</div>
+        <div class="small" style="margin-top:8px">
+          ✅ Admin হতে হলে Firestore এ <b>admins/{UID}</b> document থাকতে হবে এবং <b>role="admin"</b>, <b>active=true</b> হতে হবে।
+        </div>
+      </div>
+
+      <div class="card hide" id="cardPanel">
+        <h2>DASHBOARD</h2>
+        <div class="pill" id="who">Checking...</div>
+        <div class="status" id="panelMsg">Ready.</div>
+
+        <div class="two" style="margin-top:12px">
+          <div class="card" style="margin:0; background:rgba(0,0,0,.12)">
+            <h2>USER BALANCE (ADD / SET / CHECK)</h2>
+            <div class="row">
+              <input id="userKey" placeholder="User UID or Email" />
+              <input id="amount" placeholder="Amount (e.g. 500)" inputmode="numeric" />
+            </div>
+            <div class="btns">
+              <button id="btnCheckBal">CHECK</button>
+              <button class="primary" id="btnAddBal">ADD</button>
+              <button id="btnSetBal">SET</button>
+            </div>
+            <div class="small">Path: <b>users/{uid}.balance</b> (number)</div>
+          </div>
+
+          <div class="card" style="margin:0; background:rgba(0,0,0,.12)">
+            <h2>PAYMENT NUMBERS (settings/payment)</h2>
+            <div class="row">
+              <input id="bkash" placeholder="bKash number" />
+              <input id="nagad" placeholder="Nagad number" />
+            </div>
+            <div class="row" style="margin-top:10px">
+              <input id="rocket" placeholder="Rocket number" />
+            </div>
+            <div class="btns">
+              <button id="btnLoadPay">LOAD</button>
+              <button class="primary" id="btnSavePay">SAVE</button>
+            </div>
+            <div class="small">Doc: <b>settings/payment</b></div>
+          </div>
+        </div>
+
+        <div class="two" style="margin-top:14px">
+          <div class="card" style="margin:0; background:rgba(0,0,0,.12)">
+            <h2>SEND NOTIFICATION</h2>
+            <div class="row">
+              <input id="notifTo" placeholder="User UID (blank = broadcast)" />
+              <input id="notifTitle" placeholder="Title" />
+            </div>
+            <div style="margin-top:10px">
+              <textarea id="notifBody" placeholder="Message..."></textarea>
+            </div>
+            <div class="btns">
+              <button class="primary" id="btnSendNotif">SEND</button>
+            </div>
+            <div class="small">Writes: <b>notifications</b> collection (auto ID)</div>
+          </div>
+
+          <div class="card" style="margin:0; background:rgba(0,0,0,.12)">
+            <h2>USER LIST (last 50)</h2>
+            <div class="btns">
+              <button id="btnLoadUsers">LOAD USERS</button>
+            </div>
+            <div style="margin-top:10px; overflow:auto">
+              <table>
+                <thead>
+                  <tr>
+                    <th>UID</th>
+                    <th>Email</th>
+                    <th>Balance</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTbody">
+                  <tr><td colspan="3" class="small">No data loaded.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="small" style="margin-top:8px">Collection: <b>users</b></div>
+          </div>
+        </div>
+
+        <div class="two" style="margin-top:14px">
+          <div class="card" style="margin:0; background:rgba(0,0,0,.12)">
+            <h2>PENDING DEPOSIT REQUESTS</h2>
+            <div class="small">Collection: <b>depositRequests</b> — status: "pending"</div>
+            <div class="btns">
+              <button id="btnLoadDeposits">LOAD</button>
+            </div>
+            <div style="margin-top:10px; overflow:auto">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Request ID</th>
+                    <th>User UID</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>TxID</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="depTbody">
+                  <tr><td colspan="6" class="small">No data loaded.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card" style="margin:0; background:rgba(0,0,0,.12)">
+            <h2>PENDING PURCHASE REQUESTS</h2>
+            <div class="small">Collection: <b>purchaseRequests</b> — status: "pending"</div>
+            <div class="btns">
+              <button id="btnLoadPurchases">LOAD</button>
+            </div>
+            <div style="margin-top:10px; overflow:auto">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Request ID</th>
+                    <th>User UID</th>
+                    <th>Service</th>
+                    <th>Cost</th>
+                    <th>Phone</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="purTbody">
+                  <tr><td colspan="6" class="small">No data loaded.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="small" style="margin-top:8px">
+              Approve করলে: status="approved" + user notification.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- IMPORTANT: use your existing firebase.js (same folder) -->
+  <script type="module" src="./admin.js"></script>
+</body>
+</html>
