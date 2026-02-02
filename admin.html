@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Phone Guard • Admin</title>
+  <style>
+    :root{--bg:#041612;--card:#06251f;--line:rgba(0,255,200,.18);--t:#dffdf6;--m:#89d8c7;--a:#17f5c3;--b:#0ea5e9;--bad:#ff6b6b;--ok:#34d399}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;font-family:ui-monospace,Menlo,Consolas,monospace;background:
+      radial-gradient(1200px 600px at 50% -100px, rgba(23,245,195,.25), transparent 60%),
+      radial-gradient(900px 500px at 20% 20%, rgba(14,165,233,.18), transparent 60%), var(--bg);
+      color:var(--t); padding:18px}
+    .wrap{max-width:980px;margin:0 auto}
+    .hero{border:1px solid var(--line);background:rgba(0,0,0,.25);border-radius:22px;padding:18px;text-align:center}
+    h1{margin:0;letter-spacing:.35em;color:var(--a)}
+    .sub{margin-top:8px;color:var(--m);font-size:13px}
+    .grid{display:grid;gap:14px;margin-top:14px;grid-template-columns:1fr}
+    @media(min-width:860px){.grid{grid-template-columns:1fr 1fr}}
+    .card{border:1px solid var(--line);background:rgba(0,0,0,.25);border-radius:18px;padding:14px}
+    .card h2{margin:0 0 10px;color:var(--a);letter-spacing:.18em;font-size:15px}
+    label{display:block;color:var(--m);font-size:12px;margin:10px 0 6px}
+    input,textarea{width:100%;padding:12px;border-radius:14px;border:1px solid rgba(0,255,200,.16);background:rgba(0,0,0,.35);color:var(--t);outline:none}
+    textarea{min-height:90px;resize:vertical}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .row>*{flex:1}
+    button{padding:12px 14px;border-radius:14px;border:1px solid rgba(0,255,200,.16);background:rgba(0,0,0,.35);color:var(--t);cursor:pointer;font-weight:800;letter-spacing:.06em}
+    button.primary{border:0;background:linear-gradient(90deg, rgba(23,245,195,.9), rgba(14,165,233,.75));color:#02110e}
+    button.danger{border-color:rgba(255,107,107,.45);color:#ffd7df}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border-radius:999px;border:1px solid rgba(0,255,200,.16);color:var(--m);background:rgba(0,0,0,.25);font-size:12px}
+    .status{margin-top:10px;padding:10px 12px;border-radius:14px;border:1px solid rgba(0,255,200,.16);background:rgba(0,0,0,.25);color:var(--m);white-space:pre-wrap;word-break:break-word}
+    .ok{border-color:rgba(52,211,153,.35);color:#c9ffe9}
+    .bad{border-color:rgba(255,107,107,.35);color:#ffd7df}
+    .hide{display:none!important}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{border-bottom:1px solid rgba(0,255,200,.10);padding:10px 6px;font-size:12px;vertical-align:top}
+    th{color:var(--m);text-align:left}
+    .mini{font-size:11px;color:var(--m)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>PHONE GUARD</h1>
+      <div class="sub">Admin Panel (Login + Admin Check)</div>
+      <div style="margin-top:12px" class="row" >
+        <span class="pill" id="pAuth">Auth: -</span>
+        <span class="pill" id="pAdmin">Admin: -</span>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>LOGIN</h2>
+        <label>Email</label>
+        <input id="email" type="email" placeholder="admin@gmail.com" autocomplete="username"/>
+        <label>Password</label>
+        <input id="pass" type="password" placeholder="••••••••" autocomplete="current-password"/>
+        <div class="row" style="margin-top:10px">
+          <button class="primary" id="btnLogin">LOGIN</button>
+          <button class="danger" id="btnLogout">LOGOUT</button>
+          <button id="btnReload">RELOAD</button>
+        </div>
+        <div class="status" id="msg">Ready.</div>
+      </div>
+
+      <div class="card hide" id="panel">
+        <h2>QUICK ACTIONS</h2>
+
+        <div class="mini">Balance path: <b>users/{uid}.balance</b></div>
+        <label>User UID</label>
+        <input id="uUid" placeholder="User UID"/>
+        <label>Amount</label>
+        <input id="uAmt" type="number" placeholder="e.g. 500"/>
+        <div class="row" style="margin-top:10px">
+          <button id="btnCheck">CHECK</button>
+          <button class="primary" id="btnAdd">ADD</button>
+          <button id="btnSet">SET</button>
+        </div>
+        <div class="status" id="balMsg">—</div>
+
+        <hr style="border:0;border-top:1px solid rgba(0,255,200,.12);margin:14px 0">
+
+        <div class="mini">Pending deposits: <b>depositRequests</b> where status == "pending"</div>
+        <button id="btnLoadDep">LOAD PENDING DEPOSITS</button>
+        <div class="status" id="depMsg">—</div>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>User</th><th>Amount</th><th>Method</th><th>TxID</th><th>Last4</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="depBody">
+              <tr><td colspan="7" class="mini">No data</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+<script type="module">
+  // ✅ Firebase CDN (same version everywhere)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+  import {
+    getAuth, setPersistence, browserLocalPersistence,
+    signInWithEmailAndPassword, signOut, onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+  import {
+    getFirestore, doc, getDoc, setDoc, updateDoc,
+    collection, getDocs, query, where, limit,
+    serverTimestamp, increment, runTransaction
+  } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+  // ✅ তোমার config (phone-guard-user-new)
+  const firebaseConfig = {
+    apiKey: "AIzaSyD_eOcX7P77xLFnOPf3yWk3P-Qyhbyab5E",
+    authDomain: "phone-guard-user-new.firebaseapp.com",
+    projectId: "phone-guard-user-new",
+    storageBucket: "phone-guard-user-new.firebasestorage.app",
+    messagingSenderId: "764033397081",
+    appId: "1:764033397081:web:182fd2c7cfc663e36c5c48"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const $ = (id)=>document.getElementById(id);
+  const pAuth = $("pAuth"), pAdmin = $("pAdmin"), panel = $("panel");
+  const msg = $("msg"), balMsg = $("balMsg"), depMsg = $("depMsg"), depBody = $("depBody");
+
+  const setMsg = (el, text, type)=>{
+    el.classList.remove("ok","bad");
+    if(type) el.classList.add(type);
+    el.textContent = text;
+  };
+
+  async function checkAdmin(uid){
+    const ref = doc(db, "admins", uid);
+    const snap = await getDoc(ref);
+    if(!snap.exists()) return false;
+    const d = snap.data();
+    return d?.role === "admin" && d?.active === true;
+  }
+
+  async function ensureUser(uid){
+    const uref = doc(db, "users", uid);
+    const snap = await getDoc(uref);
+    if(!snap.exists()){
+      await setDoc(uref, { balance:0, createdAt: serverTimestamp() }, { merge:true });
+    }
+    return uref;
+  }
+
+  await setPersistence(auth, browserLocalPersistence);
+
+  $("btnLogin").onclick = async ()=>{
+    try{
+      const email = $("email").value.trim();
+      const pass = $("pass").value;
+      if(!email || !pass) return setMsg(msg,"Email + Password দিন","bad");
+      setMsg(msg,"Signing in...","");
+      await signInWithEmailAndPassword(auth, email, pass);
+    }catch(e){
+      setMsg(msg,"Login failed: " + (e?.message||e),"bad");
+    }
+  };
+
+  $("btnLogout").onclick = async ()=>{
+    try{ await signOut(auth); }catch(e){ setMsg(msg,"Logout error: "+(e?.message||e),"bad"); }
+  };
+
+  $("btnReload").onclick = ()=>location.reload();
+
+  onAuthStateChanged(auth, async (user)=>{
+    if(!user){
+      pAuth.textContent = "Auth: not signed in";
+      pAdmin.textContent = "Admin: -";
+      panel.classList.add("hide");
+      setMsg(msg,"Not signed in.","");
+      return;
+    }
+    pAuth.textContent = `Auth: ${user.email} • ${user.uid}`;
+    setMsg(msg,"Checking admin...","");
+    const ok = await checkAdmin(user.uid);
+    if(!ok){
+      pAdmin.textContent = "Admin: NO";
+      panel.classList.add("hide");
+      setMsg(msg,"❌ Not admin. Firestore এ admins/{UID} doc আছে কিনা check করো (role=admin, active=true).","bad");
+      return;
+    }
+    pAdmin.textContent = "Admin: YES";
+    panel.classList.remove("hide");
+    setMsg(msg,"✅ Admin verified. Panel ready.","ok");
+  });
+
+  // Balance buttons
+  $("btnCheck").onclick = async ()=>{
+    try{
+      const uid = $("uUid").value.trim();
+      if(!uid) return setMsg(balMsg,"User UID দিন","bad");
+      const uref = await ensureUser(uid);
+      const s = await getDoc(uref);
+      setMsg(balMsg,`Balance: ${Number(s.data()?.balance||0)}`,"ok");
+    }catch(e){ setMsg(balMsg,"Error: "+(e?.message||e),"bad"); }
+  };
+
+  $("btnAdd").onclick = async ()=>{
+    try{
+      const uid = $("uUid").value.trim();
+      const amt = Number($("uAmt").value);
+      if(!uid) return setMsg(balMsg,"User UID দিন","bad");
+      if(!Number.isFinite(amt) || amt<=0) return setMsg(balMsg,"Valid amount দিন (>0)","bad");
+      const uref = await ensureUser(uid);
+      await updateDoc(uref,{ balance: increment(amt), updatedAt: serverTimestamp() });
+      const s = await getDoc(uref);
+      setMsg(balMsg,`✅ Added ${amt}. New balance: ${Number(s.data()?.balance||0)}`,"ok");
+    }catch(e){ setMsg(balMsg,"Error: "+(e?.message||e),"bad"); }
+  };
+
+  $("btnSet").onclick = async ()=>{
+    try{
+      const uid = $("uUid").value.trim();
+      const amt = Number($("uAmt").value);
+      if(!uid) return setMsg(balMsg,"User UID দিন","bad");
+      if(!Number.isFinite(amt) || amt<0) return setMsg(balMsg,"Valid amount দিন (>=0)","bad");
+      const uref = await ensureUser(uid);
+      await updateDoc(uref,{ balance: amt, updatedAt: serverTimestamp() });
+      setMsg(balMsg,`✅ Set balance = ${amt}`,"ok");
+    }catch(e){ setMsg(balMsg,"Error: "+(e?.message||e),"bad"); }
+  };
+
+  // Deposits (pending)
+  $("btnLoadDep").onclick = async ()=>{
+    try{
+      setMsg(depMsg,"Loading...","");
+      depBody.innerHTML = "";
+      const q = query(collection(db,"depositRequests"), where("status","==","pending"), limit(50));
+      const snap = await getDocs(q);
+      if(snap.empty){
+        depBody.innerHTML = `<tr><td colspan="7" class="mini">No pending deposits</td></tr>`;
+        setMsg(depMsg,"No pending deposits.","ok");
+        return;
+      }
+      snap.forEach(d=>{
+        const r = d.data()||{};
+        const last4 = r.last4 ?? r.last ?? r.lastNumber ?? "-";
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${d.id}</td>
+          <td>${r.userUid || r.uid || "-"}</td>
+          <td>${Number(r.amount||0)}</td>
+          <td>${r.method||"-"}</td>
+          <td>${r.txid || r.txId || "-"}</td>
+          <td>${last4}</td>
+          <td>
+            <button data-a="${d.id}" style="padding:8px 10px;border-radius:10px;border:0;background:linear-gradient(90deg, rgba(23,245,195,.9), rgba(14,165,233,.75));cursor:pointer;font-weight:800">APPROVE</button>
+          </td>`;
+        tr.querySelector("button").onclick = ()=>approveDeposit(d.id);
+        depBody.appendChild(tr);
+      });
+      setMsg(depMsg,`Loaded ${snap.size} pending deposit(s).`,"ok");
+    }catch(e){
+      setMsg(depMsg,"Error: "+(e?.message||e),"bad");
+    }
+  };
+
+  async function approveDeposit(reqId){
+    try{
+      setMsg(depMsg,"Approving...","");
+      const reqRef = doc(db,"depositRequests",reqId);
+
+      await runTransaction(db, async (tx)=>{
+        const rs = await tx.get(reqRef);
+        if(!rs.exists()) throw new Error("Request not found");
+        const r = rs.data();
+        if(r.status !== "pending") throw new Error("Already processed");
+
+        const userUid = r.userUid || r.uid;
+        const amount = Number(r.amount);
+
+        if(!userUid) throw new Error("depositRequests এ uid/userUid নাই");
+        if(!Number.isFinite(amount) || amount<=0) throw new Error("amount invalid");
+
+        const uref = doc(db,"users",userUid);
+        const us = await tx.get(uref);
+        if(!us.exists()) tx.set(uref,{balance:0,createdAt:serverTimestamp()},{merge:true});
+
+        tx.update(uref,{ balance: increment(amount), updatedAt: serverTimestamp() });
+        tx.update(reqRef,{ status:"approved", approvedAt: serverTimestamp(), approvedBy: auth.currentUser.uid });
+      });
+
+      setMsg(depMsg,"✅ Approved + balance added.","ok");
+      $("btnLoadDep").click();
+    }catch(e){
+      setMsg(depMsg,"Approve error: "+(e?.message||e),"bad");
+    }
+  }
+</script>
+</body>
+</html>
